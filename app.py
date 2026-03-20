@@ -1,29 +1,51 @@
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 import os
-from flask import Flask, render_template, request, jsonify
 from groq import Groq
 
-app = Flask(__name__)
-client = Groq(api_key=os.environ.get("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"))
+app = Flask(__name__, static_folder='templates', static_url_path='')
+CORS(app)
 
-messages = [
-    {"role": "system", "content": "Ты дружелюбный помощник по имени MoreshAI. Отвечай на русском."}
-]
+# Инициализация Groq клиента
+# API ключ берется из переменных окружения Render
+client = Groq(
+    api_key=os.environ.get("GROQ_API_KEY", "")
+)
 
-@app.route("/")
+@app.route('/')
 def index():
-    return render_template("index.html")
+    return send_from_directory('templates', 'index.html')
 
-@app.route("/chat", methods=["POST"])
+@app.route('/chat', methods=['POST'])
 def chat():
-    user_input = request.json.get("message")
-    messages.append({"role": "user", "content": user_input})
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=messages
-    )
-    answer = response.choices[0].message.content
-    messages.append({"role": "assistant", "content": answer})
-    return jsonify({"reply": answer})
+    try:
+        data = request.json
+        user_message = data.get('message', '')
+        
+        if not user_message:
+            return jsonify({'reply': 'Пожалуйста, введите сообщение'}), 400
+        
+        # Проверка наличия API ключа
+        if not client.api_key:
+            return jsonify({'reply': 'Ошибка: API ключ Groq не настроен'}), 500
+        
+        # Запрос к Groq API
+        completion = client.chat.completions.create(
+            model="llama-3.3-70b-versatile",  # или другую модель Groq
+            messages=[
+                {"role": "user", "content": user_message}
+            ],
+            temperature=0.7,
+            max_tokens=1024
+        )
+        
+        reply = completion.choices[0].message.content
+        return jsonify({'reply': reply})
+        
+    except Exception as e:
+        print(f"Ошибка: {e}")  # Логирование ошибки
+        return jsonify({'reply': f'Извините, произошла ошибка. Попробуйте позже.'}), 500
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
