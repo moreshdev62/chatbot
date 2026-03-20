@@ -1,32 +1,29 @@
-import streamlit as st
+import os
+from flask import Flask, render_template, request, jsonify
 from groq import Groq
 
-client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+app = Flask(__name__)
+client = Groq(api_key=os.environ.get("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"))
 
-st.title("MoreshAI")
+messages = [
+    {"role": "system", "content": "Ты дружелюбный помощник по имени MoreshAI. Отвечай на русском."}
+]
 
-if "messages" not in st.session_state:
-    st.session_state.messages = [
-        {"role": "system", "content": "Ты дружелюбный помощник по имени MoreshAI. Отвечай на русском."}
-    ]
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-for msg in st.session_state.messages:
-    if msg["role"] != "system":
-        with st.chat_message(msg["role"]):
-            st.write(msg["content"])
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_input = request.json.get("message")
+    messages.append({"role": "user", "content": user_input})
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=messages
+    )
+    answer = response.choices[0].message.content
+    messages.append({"role": "assistant", "content": answer})
+    return jsonify({"reply": answer})
 
-if prompt := st.chat_input("Напиши сообщение..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.write(prompt)
-
-    with st.chat_message("assistant"):
-        with st.spinner("Думаю..."):
-            response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
-                messages=st.session_state.messages
-            )
-            answer = response.choices[0].message.content
-            st.write(answer)
-
-    st.session_state.messages.append({"role": "assistant", "content": answer})
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
