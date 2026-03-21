@@ -118,7 +118,7 @@ body::before { content: ''; position: fixed; top: -30%; left: 50%; transform: tr
   <div class="sidebar-label">Сегодня</div>
   <div class="history-item active" id="hist-current">Новый чат</div>
   <div class="sidebar-footer">
-    <div class="model-pill"><div class="online-dot"></div>MoreshAI</div>
+    <div class="model-pill"><div class="online-dot"></div>llama-3.3-70b</div>
   </div>
 </div>
 <div class="main">
@@ -173,7 +173,7 @@ function addMsg(text,role){
   if(isFirst){welcome.style.display='none';const label=text.slice(0,30)+(text.length>30?"…":"");document.getElementById("hist-current").textContent=label;document.getElementById("topbar-name").textContent=label;isFirst=false;}
   const wrap=document.createElement("div");wrap.className=`message ${role}`;
   const av=document.createElement("div");av.className="msg-avatar";
-  if(role==="bot"){av.innerHTML=`<img src="ССЫЛКА_НА_ЛОГО" alt="M" onerror="this.parentElement.textContent='M'">`;}else{av.textContent="Я";}
+  if(role==="bot"){av.innerHTML=`<img src="https://i.ibb.co/zWrHgfhF/image.jpg" alt="M" onerror="this.parentElement.textContent='M'">`;}else{av.textContent="Я";}
   const body=document.createElement("div");body.className="msg-body";
   const name=document.createElement("div");name.className="msg-name";name.textContent=role==="bot"?"MoreshAI":"Вы";
   const txt=document.createElement("div");txt.className="msg-text";txt.textContent=text;
@@ -181,7 +181,7 @@ function addMsg(text,role){
 }
 function addTyping(){
   const wrap=document.createElement("div");wrap.className="message bot";wrap.id="typing";
-  const av=document.createElement("div");av.className="msg-avatar";av.innerHTML=`<img src="ССЫЛКА_НА_ЛОГО" alt="M" onerror="this.parentElement.textContent='M'">`;
+  const av=document.createElement("div");av.className="msg-avatar";av.innerHTML=`<img src="https://i.ibb.co/zWrHgfhF/image.jpg" alt="M" onerror="this.parentElement.textContent='M'">`;
   const body=document.createElement("div");body.className="msg-body";
   const name=document.createElement("div");name.className="msg-name";name.textContent="MoreshAI";
   const dots=document.createElement("div");dots.className="typing-indicator";dots.innerHTML="<span></span><span></span><span></span>";
